@@ -1,0 +1,6 @@
+# Routes
+# This file defines all application app.routes (Higher priority app.routes first)
+# ~~~~
+
+POST    /create-new-user            controllers.userregister.RegisterController.createUserAccount()
+POST    /create-new-org-user        controllers.userregister.RegisterController.createOrgAccount()
