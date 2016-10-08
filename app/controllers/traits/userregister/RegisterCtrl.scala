@@ -18,7 +18,7 @@ package controllers.traits.userregister
 
 import config.{Authorised, BackController, NotAuthorised}
 import models.auth.{OrgAccount, UserAccount}
-import play.api.mvc.Action
+import play.api.mvc.{Action, AnyContent}
 import services.UserRegisterService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,7 +36,7 @@ trait RegisterCtrl extends BackController {
             accData =>
               userRegisterService.storeNewUser(accData) map {
                 case true => InternalServerError
-                case false => Ok
+                case false => Created
               }
           }
         case NotAuthorised => Future.successful(Forbidden)
@@ -51,7 +51,7 @@ trait RegisterCtrl extends BackController {
             orgAccData =>
               userRegisterService.storeNewOrgUser(orgAccData) map {
                 case true => InternalServerError
-                case false => Ok
+                case false => Created
               }
           }
         case NotAuthorised => Future.successful(Forbidden)
