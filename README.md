@@ -25,7 +25,7 @@ Routes
 |```/cjww-rest-api/create-new-user```                                                |       POST        | creates a new user account |
 |```/cjww-rest-api/create-new-org-user```                                            |       POST        | creates a new org user account |
 
-###GET /cjww-rest-api/create-new-user
+###POST /cjww-rest-api/create-new-user
 
     Responds with:
 
@@ -37,7 +37,7 @@ Routes
 | 404           |
 | 500           |
 
-###GET /cjww-rest-api/create-new-org-user
+###POST /cjww-rest-api/create-new-org-user
 
     Responds with:
 
