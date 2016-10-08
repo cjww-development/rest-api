@@ -1,5 +1,5 @@
 [![Apache-2.0 license](http://img.shields.io/badge/license-Apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![Build Status](https://travis-ci.org/chrisjwwalker/cjww-rest-api-mongo.svg?branch=master)](https://travis-ci.org/chrisjwwalker/cjww-rest-api-mongo)
+[![Build Status](https://travis-ci.org/cjww-development/rest-api.svg?branch=master)](https://travis-ci.org/cjww-development/rest-api)
 
 cjww-rest-api-mongo
 ===================
