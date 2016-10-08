@@ -45,7 +45,7 @@ trait BackController extends Controller {
   }
 
   protected def authOpenAction(f: (AuthorisationResponse) => Future[Result])(implicit request: Request[_]) = {
-    f(checkAuth(request.session.get("appID")))
+    f(checkAuth(request.headers.get("appID")))
   }
 
   private def checkAuth(id : Option[String]) : AuthorisationResponse = {
@@ -54,5 +54,4 @@ trait BackController extends Controller {
       case None => NotAuthorised
     }
   }
-
 }
