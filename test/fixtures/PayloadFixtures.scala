@@ -17,9 +17,9 @@
 package fixtures
 
 trait PayloadFixtures {
-  val invalidPayload = "7eqO/a356L5bEcP0NCK5QoblZJmy4RZgzi9FbaWvkbs="
-  val validUserAccountPayload =
+  final val invalidPayload = "7eqO/a356L5bEcP0NCK5QoblZJmy4RZgzi9FbaWvkbs="
+  final val validUserAccountPayload =
     "el76E6N/MRiD8mQknEb4DhpzyCxOOMOGmrrmDgYNAkcVlJhUc7eXbqqDiAnmfmzG+wLE/Gq17b9cnrpiEeR3rEP+ktkCdDGLMcUzcEUKc+pbtzkFc0EAB/2ahFZM0VWjRusnE3mmkVk/e25y+EEs3cgJO0tqRcx26Xt7kSWz+9nWfmxrUYDkAcjasNL7rehiRryCE74/XNowkfP17F66ZQ=="
-  val validOrgAccountPayload =
+  final val validOrgAccountPayload =
     "2m1oEtWLRtIinCfWtQ8ateRtRxRj/whU1lmL3ciZ8j1pvB3JlLRiWRKnFLFma25zmZ/FWVmKRZw8hv5WRHeqx45Sk6ipLEGmR1BM98FahOpusKrBBv2bSiFlew4bfTDpKdCEJS+8ymBoVjJxaC5/lJZcPevTWqxeEl13TX42ZY342sXpC22fUZuppirlFB2m++jHsSam4YGc9qxeayN5AA=="
 }

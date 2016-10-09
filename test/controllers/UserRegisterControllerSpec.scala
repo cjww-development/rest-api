@@ -23,21 +23,29 @@ import models.auth.{OrgAccount, UserAccount}
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.mvc.Headers
 import play.api.test.FakeRequest
 import services.UserRegisterService
 import play.api.test.Helpers._
+import akka.actor._
+import akka.stream._
+import config.ConfigurationStrings
+import play.api.libs.ws.ahc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with PayloadFixtures {
+class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with PayloadFixtures with ScalaFutures with ConfigurationStrings {
 
   val mockUserRegisterService = mock[UserRegisterService]
 
   val testAccData = UserAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
   val testOrgAccData = OrgAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
+
+  implicit val system = ActorSystem()
+  implicit val materializer = ActorMaterializer()
+  val ws = AhcWSClient()
 
   class Setup {
     class TestController extends RegisterCtrl {
@@ -56,30 +64,19 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
 
   "POSTing to the createUserAccount" should {
     "return a forbidden if appID cannot be found in the header" in new Setup {
-      val result = testController.createUserAccount()(FakeRequest())
+      val result = testController.createUserAccount()(FakeRequest().withHeaders(CONTENT_TYPE -> TEXT))
+      val future = result.run()
 
-      result.map {
-        res => res.header.status mustBe FORBIDDEN
-      }
+      status(future) mustBe FORBIDDEN
     }
 
-    "return a not found if no request body can be found" in new Setup {
-      val result = testController.createUserAccount()(FakeRequest().withHeaders("appID" -> "FAKE_APP_ID"))
-
-      result.map {
-        res => res.header.status mustBe NOT_FOUND
-      }
-    }
-
-    "return a bad request if the payload cannot be decrypted into the specified case class" in new Setup {
+    "return a not found if the payload cannot be decrypted into the specified case class" in new Setup {
       val result =
         testController.createUserAccount()(FakeRequest()
-          .withHeaders("appID" -> "FAKE_APP_ID")
+          .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
           .withBody(invalidPayload))
 
-      result.map {
-        res => res.header.status mustBe BAD_REQUEST
-      }
+      status(result) mustBe NOT_FOUND
     }
 
     "return an internal server error if the payload cannot be saved into mongo" in new Setup {
@@ -88,12 +85,10 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
 
       val result =
         testController.createUserAccount()(FakeRequest()
-          .withHeaders("appID" -> "FAKE_APP_ID")
+          .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
           .withBody(validUserAccountPayload))
 
-      result.map {
-        res => res.header.status mustBe INTERNAL_SERVER_ERROR
-      }
+      status(result) mustBe INTERNAL_SERVER_ERROR
     }
 
     "return a created if the payload is stored in mongo" in new Setup {
@@ -102,41 +97,30 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
 
       val result =
         testController.createUserAccount()(FakeRequest()
-          .withHeaders("appID" -> "FAKE_APP_ID")
+          .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
           .withBody(validUserAccountPayload))
 
-      result.map {
-        res => res.header.status mustBe CREATED
-      }
+      status(result) mustBe CREATED
     }
   }
 
   "POSTing to the createOrgAccount" should {
     "return a forbidden if appID cannot be found in the header" in new Setup {
-      val result = testController.createOrgAccount()(FakeRequest())
+      val result = testController.createOrgAccount()(FakeRequest()
+        .withHeaders(CONTENT_TYPE -> TEXT))
 
-      result.map {
-        res => res.header.status mustBe FORBIDDEN
-      }
+      val future = result.run()
+
+      status(future) mustBe FORBIDDEN
     }
 
-    "return a not found if no request body can be found" in new Setup {
-      val result = testController.createOrgAccount()(FakeRequest().withHeaders("appID" -> "FAKE_APP_ID"))
-
-      result.map {
-        res => res.header.status mustBe NOT_FOUND
-      }
-    }
-
-    "return a bad request if the payload cannot be decrypted into the specified case class" in new Setup {
+    "return a not found if the payload cannot be decrypted into the specified case class" in new Setup {
       val result =
         testController.createOrgAccount()(FakeRequest()
-          .withHeaders("appID" -> "FAKE_APP_ID")
+          .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
           .withBody(invalidPayload))
 
-      result.map {
-        res => res.header.status mustBe BAD_REQUEST
-      }
+      status(result) mustBe NOT_FOUND
     }
 
     "return an internal server error if the payload cannot be saved into mongo" in new Setup {
@@ -145,12 +129,10 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
 
       val result =
         testController.createOrgAccount()(FakeRequest()
-          .withHeaders("appID" -> "FAKE_APP_ID")
-          .withBody(validUserAccountPayload))
+          .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
+          .withBody(validOrgAccountPayload))
 
-      result.map {
-        res => res.header.status mustBe INTERNAL_SERVER_ERROR
-      }
+      status(result) mustBe INTERNAL_SERVER_ERROR
     }
 
     "return a created if the payload is stored in mongo" in new Setup {
@@ -159,12 +141,10 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
 
       val result =
         testController.createOrgAccount()(FakeRequest()
-          .withHeaders("appID" -> "FAKE_APP_ID")
-          .withBody(validUserAccountPayload))
+          .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
+          .withBody(validOrgAccountPayload))
 
-      result.map {
-        res => res.header.status mustBe CREATED
-      }
+      status(result) mustBe CREATED
     }
   }
 }
