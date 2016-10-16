@@ -5,4 +5,4 @@
 POST    /create-new-user            controllers.auth.RegisterController.createUserAccount
 POST    /create-new-org-user        controllers.auth.RegisterController.createOrgAccount
 
-POST    /individual-user-login      controllers.auth.LoginController.userLogin
+GET     /individual-user-login      controllers.auth.LoginController.userLogin

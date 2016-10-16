@@ -24,6 +24,7 @@ Routes
 | ---------------------------------------------------------------------------------- | ------------------| ------------ |
 |```/cjww-rest-api/create-new-user```                                                |       POST        | creates a new user account |
 |```/cjww-rest-api/create-new-org-user```                                            |       POST        | creates a new org user account |
+|```/cjww-rest-api/individual-user-login```                                            |       GET        | validates an individual user |
 
 ###POST /cjww-rest-api/create-new-user
 
@@ -46,6 +47,19 @@ Routes
 | 200           |
 | 403           |
 | 400           |
+| 404           |
+| 500           |
+
+###GET /cjww-rest-api/individual-user-login
+
+    Responds with:
+
+| Status        |
+|:--------------|
+| 200           |
+| 403           |
+| 400           |
+| 401           |
 | 404           |
 | 500           |
 
