@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
 scalaVersion := "2.11.7"
 
 //PlayKeys.devSettings := Seq("play.server.http.port" -> "disabled")
-//PlayKeys.devSettings := Seq("play.server.https.port" -> "9973")
+PlayKeys.devSettings := Seq("play.server.http.port" -> "9973")
 
 libraryDependencies ++= Seq(
   jdbc,

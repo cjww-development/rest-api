@@ -16,7 +16,7 @@
 
 package security
 
-import models.auth.{OrgAccount, UserAccount}
+import models.auth.{Login, OrgAccount, UserAccount}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
@@ -30,6 +30,7 @@ class JsonSecuritySpec extends PlaySpec {
     val testData = TestModel("TestString")
     val testAccData = UserAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
     val testOrgAccData = OrgAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
+    val testLogin = Login("testUserName","testPassword")
   }
 
   "Enc and Dec a model" should {
@@ -52,6 +53,14 @@ class JsonSecuritySpec extends PlaySpec {
       val dec = TestSec.decryptInto[OrgAccount](enc.get)
       assert(dec.get == testOrgAccData)
       assert(dec.get.email == testAccData.email)
+    }
+
+    "return a live system Login model" in new Setup {
+      val enc = TestSec.encryptModel[Login](testLogin)
+      val dec = TestSec.decryptInto[Login](enc.get)
+      assert(dec.get == testLogin)
+      assert(dec.get.userName == testLogin.userName)
+      assert(dec.get.password == testLogin.password)
     }
   }
 }

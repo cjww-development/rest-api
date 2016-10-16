@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package controllers.traits.userregister
+package controllers.traits.auth
 
 import config.{Authorised, BackController, NotAuthorised}
 import models.auth.{OrgAccount, UserAccount}

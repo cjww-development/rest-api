@@ -27,7 +27,7 @@ sealed trait AuthorisationResponse
 case object NotAuthorised extends AuthorisationResponse
 case object Authorised extends AuthorisationResponse
 
-trait BackController extends Controller {
+trait BackController extends Controller with ConfigurationStrings {
 
   protected def processJsonBody[T](f: (T) => Future[Result])(implicit request : JsValue, manifest : Manifest[T], reads : Reads[T]) =
     Try(request.validate[T]) match {
@@ -48,9 +48,12 @@ trait BackController extends Controller {
     f(checkAuth(request.headers.get("appID")))
   }
 
-  private def checkAuth(id : Option[String]) : AuthorisationResponse = {
-    id match {
-      case Some(x) => Authorised
+  private def checkAuth(appID : Option[String]) : AuthorisationResponse = {
+    appID match {
+      case Some(id) => id match {
+        case AUTH_ID | DIAG_ID | DEV_ID => Authorised
+        case _ => NotAuthorised
+      }
       case None => NotAuthorised
     }
   }
