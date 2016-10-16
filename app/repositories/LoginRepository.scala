@@ -14,11 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package controllers.userregister
+package repositories
 
-import controllers.traits.userregister.RegisterCtrl
-import services.UserRegisterService
+import config.MongoCollections
+import connectors.MongoConnector
+import models.auth.{Login, UserAccount}
+import reactivemongo.bson.BSONDocument
 
-class RegisterController extends RegisterCtrl {
-  val userRegisterService = UserRegisterService
+import scala.concurrent.Future
+
+object LoginRepository extends LoginRepository {
+  val mongoConnector = MongoConnector
+}
+
+trait LoginRepository extends MongoCollections {
+
+  val mongoConnector : MongoConnector
+
+  def validateSingleUser(userDetails : Login) : Future[Option[UserAccount]] = {
+    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("userName" -> userDetails.userName, "password" -> userDetails.password))
+  }
 }

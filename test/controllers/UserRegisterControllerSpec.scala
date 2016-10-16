@@ -16,8 +16,8 @@
 
 package controllers
 
-import controllers.traits.userregister.RegisterCtrl
-import controllers.userregister.RegisterController
+import controllers.traits.auth.RegisterCtrl
+import controllers.auth.RegisterController
 import fixtures.PayloadFixtures
 import models.auth.{OrgAccount, UserAccount}
 import org.scalatest.mock.MockitoSugar
@@ -33,7 +33,6 @@ import akka.stream._
 import config.ConfigurationStrings
 import play.api.libs.ws.ahc._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with PayloadFixtures with ScalaFutures with ConfigurationStrings {
@@ -65,9 +64,8 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
   "POSTing to the createUserAccount" should {
     "return a forbidden if appID cannot be found in the header" in new Setup {
       val result = testController.createUserAccount()(FakeRequest().withHeaders(CONTENT_TYPE -> TEXT))
-      val future = result.run()
 
-      status(future) mustBe FORBIDDEN
+      status(result.run()) mustBe FORBIDDEN
     }
 
     "return a not found if the payload cannot be decrypted into the specified case class" in new Setup {
@@ -109,9 +107,7 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
       val result = testController.createOrgAccount()(FakeRequest()
         .withHeaders(CONTENT_TYPE -> TEXT))
 
-      val future = result.run()
-
-      status(future) mustBe FORBIDDEN
+      status(result.run()) mustBe FORBIDDEN
     }
 
     "return a not found if the payload cannot be decrypted into the specified case class" in new Setup {
