@@ -33,7 +33,7 @@ trait UserRegisterRepository extends MongoCollections {
   val mongoConnector : MongoConnector
 
   def createNewUser(newUser : UserAccount)(implicit format : OFormat[UserAccount]) : Future[WriteResult] = {
-    mongoConnector.create[UserAccount](USER_ACCOUNTS, newUser)
+    mongoConnector.create[UserAccount](USER_ACCOUNTS, newUser.withAccountID)
   }
 
   def createOrgUser(newOrgUser : OrgAccount)(implicit format : OFormat[OrgAccount]) : Future[WriteResult] = {

@@ -17,8 +17,14 @@
 package models.auth
 
 import play.api.libs.json.Json
+import services.AccountIdService
 
-case class UserAccount(accId : String, firstName : String, lastName : String, userName : String, email : String, password : String)
+case class UserAccount(_id : Option[String], firstName : String, lastName : String, userName : String, email : String, password : String)
+  extends AccountIdService {
+  def withAccountID : UserAccount = {
+    this.copy(_id = generateAccountID)
+  }
+}
 
 object UserAccount {
   implicit val format = Json.format[UserAccount]

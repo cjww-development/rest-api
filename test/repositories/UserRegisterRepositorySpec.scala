@@ -26,14 +26,15 @@ import org.mockito.Matchers
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import reactivemongo.api.commands.WriteResult
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 class UserRegisterRepositorySpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MongoMocks with MongoCollections {
 
   val mockConnector = mock[MongoConnector]
 
-  val testUserData = UserAccount("testAccId", "testFirstName", "testLastName", "testUserName", "test@email.com", "testPassword")
+  val testUserData = UserAccount(None, "testFirstName", "testLastName", "testUserName", "test@email.com", "testPassword")
   val testOrgData = OrgAccount("testOAccId", "testOrgName", "testOrgUserName", "testInitials", "test@email.com", "testPassword")
 
   val mockWR : WriteResult = mockWriteResult()
@@ -52,14 +53,13 @@ class UserRegisterRepositorySpec extends PlaySpec with OneAppPerSuite with Mocki
 
   "POSTing a new user" should {
     "create a new user account" in new Setup {
-      when(mockConnector.create[UserAccount](Matchers.eq(USER_ACCOUNTS), Matchers.eq(testUserData))(Matchers.eq(UserAccount.format)))
+      when(mockConnector.create[UserAccount](Matchers.eq(USER_ACCOUNTS), Matchers.any())(Matchers.eq(UserAccount.format)))
         .thenReturn(Future.successful(mockWR))
 
       val result = TestRepository.createNewUser(testUserData)
 
-      result map {
-        result => assert(!result.hasErrors)
-      }
+      val complete = Await.result(result, 5.seconds)
+      assert(!complete.hasErrors)
     }
 
     "create a new org account" in new Setup {

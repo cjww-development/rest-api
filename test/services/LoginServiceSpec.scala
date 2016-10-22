@@ -31,7 +31,7 @@ class LoginServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   val mockLoginRepository = mock[LoginRepository]
 
-  val testAccData = UserAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
+  val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword")
 
   class Setup {
     object TestService extends LoginService {

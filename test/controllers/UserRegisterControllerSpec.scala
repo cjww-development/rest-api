@@ -39,7 +39,7 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
 
   val mockUserRegisterService = mock[UserRegisterService]
 
-  val testAccData = UserAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
+  val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword")
   val testOrgAccData = OrgAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
 
   implicit val system = ActorSystem()
@@ -74,11 +74,11 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
           .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
           .withBody(invalidPayload))
 
-      status(result) mustBe NOT_FOUND
+      status(result) mustBe BAD_REQUEST
     }
 
     "return an internal server error if the payload cannot be saved into mongo" in new Setup {
-      when(mockUserRegisterService.storeNewUser(Matchers.eq(testAccData)))
+      when(mockUserRegisterService.storeNewUser(Matchers.any()))
         .thenReturn(Future.successful(true))
 
       val result =
@@ -90,7 +90,7 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
     }
 
     "return a created if the payload is stored in mongo" in new Setup {
-      when(mockUserRegisterService.storeNewUser(Matchers.eq(testAccData)))
+      when(mockUserRegisterService.storeNewUser(Matchers.any()))
         .thenReturn(Future.successful(false))
 
       val result =
@@ -116,7 +116,7 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
           .withHeaders("appID" -> AUTH_ID, CONTENT_TYPE -> TEXT)
           .withBody(invalidPayload))
 
-      status(result) mustBe NOT_FOUND
+      status(result) mustBe BAD_REQUEST
     }
 
     "return an internal server error if the payload cannot be saved into mongo" in new Setup {

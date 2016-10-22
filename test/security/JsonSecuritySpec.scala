@@ -28,7 +28,7 @@ class JsonSecuritySpec extends PlaySpec {
     case class TestModel(data : String)
     implicit val format = Json.format[TestModel]
     val testData = TestModel("TestString")
-    val testAccData = UserAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
+    val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword")
     val testOrgAccData = OrgAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
     val testLogin = Login("testUserName","testPassword")
   }

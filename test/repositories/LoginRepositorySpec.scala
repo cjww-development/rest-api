@@ -33,7 +33,7 @@ class LoginRepositorySpec extends PlaySpec with MockitoSugar with MongoCollectio
 
   val mockMongoConnector = mock[MongoConnector]
 
-  val testAccData = UserAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
+  val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword")
 
   class Setup {
     object TestRepository extends LoginRepository {

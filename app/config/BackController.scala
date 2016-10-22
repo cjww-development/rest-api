@@ -16,6 +16,7 @@
 
 package config
 
+import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{Controller, Request, Result}
 import security.JsonSecurity
@@ -39,7 +40,9 @@ trait BackController extends Controller with ConfigurationStrings {
   protected def decryptRequest[T](f: (T) => Future[Result])(implicit request: Request[String], manifest : Manifest[T], reads : Reads[T], format : Format[T]) = {
     Try(JsonSecurity.decryptInto[T](request.body)) match {
       case Success(Some(data)) => f(data)
-      case Success(None) => Future.successful(NotFound)
+      case Success(None) =>
+        Logger.debug(s"[BackController] [decryptRequest] Request body not found : ${request.body}")
+        Future.successful(BadRequest)
       case Failure(e) => Future.successful(BadRequest)
     }
   }
