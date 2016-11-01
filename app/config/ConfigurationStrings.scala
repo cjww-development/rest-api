@@ -27,4 +27,7 @@ trait ConfigurationStrings {
   final val AUTH_ID = config.getString(s"$env.application-ids.auth-service")
   final val DIAG_ID = config.getString(s"$env.application-ids.diagnostics-frontend")
   final val DEV_ID = config.getString(s"$env.application-ids.deversity-frontend")
+
+  final val databaseUrl = config.getString(s"$env.mongo.url")
+  final val databaseName = config.getString(s"$env.mongo.database")
 }
