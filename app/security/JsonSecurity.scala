@@ -25,6 +25,8 @@ import play.api.libs.json.{Format, JsValue, Json}
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.codec.binary.Base64
 
+import scala.util.Try
+
 object JsonSecurity extends JsonSecurity
 
 trait JsonSecurity extends JsonCommon {
@@ -42,8 +44,13 @@ trait JsonSecurity extends JsonCommon {
   def decryptInto[T](data : String)(implicit format: Format[T]) : Option[T] = {
     val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
     cipher.init(Cipher.DECRYPT_MODE, keyToSpec)
-    val unlocked = new String(cipher.doFinal(Base64.decodeBase64(data)))
-    validate[T](unlocked)
+    val attempt = Try(cipher.doFinal(Base64.decodeBase64(data)))
+    attempt.isSuccess match {
+      case true =>
+        val unlocked = new String(attempt.get)
+        validate[T](unlocked)
+      case false => None
+    }
   }
 }
 

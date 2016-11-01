@@ -62,5 +62,10 @@ class JsonSecuritySpec extends PlaySpec {
       assert(dec.get.userName == testLogin.userName)
       assert(dec.get.password == testLogin.password)
     }
+
+    "return none if input cannot be decrypted" in new Setup {
+      val dec = TestSec.decryptInto[TestModel]("invalidTestData")
+      dec mustBe None
+    }
   }
 }
