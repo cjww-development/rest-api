@@ -1,1 +1,1 @@
-web: target/universal/stage/bin/cjww-rest-api -Dhttp.port=${PORT}
+web: target/universal/stage/bin/rest-api -Dhttp.port=${PORT}
