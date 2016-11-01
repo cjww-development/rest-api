@@ -30,4 +30,6 @@ trait ConfigurationStrings {
 
   final val databaseUrl = config.getString(s"$env.mongo.url")
   final val databaseName = config.getString(s"$env.mongo.database")
+  final val databaseUserName = config.getString(s"$env.mongo.username")
+  final val databasePassword = config.getString(s"$env.mongo.password")
 }

@@ -18,9 +18,11 @@ package connectors
 
 import config.{ConfigurationStrings, MongoConfiguration}
 import play.api.libs.json.OFormat
+import reactivemongo.api.MongoConnection.ParsedURI
 import reactivemongo.api.MongoDriver
 import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
 import reactivemongo.bson.BSONDocument
+import reactivemongo.core.nodeset.Authenticate
 import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
 
@@ -29,8 +31,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object MongoConnector extends MongoConnector with MongoConfiguration with ConfigurationStrings {
   // $COVERAGE-OFF$
+  val credentials = Seq(Authenticate(s"$databaseName", s"$databaseUserName", s"$databasePassword"))
+
   val driver = new MongoDriver
-  val connection = driver.connection(List(s"$databaseUrl"))
+  val connection = driver.connection(List(s"$databaseUrl"), authentications = credentials)
   val database = connection.database(s"$databaseName")
 
   def collection(name : String) : Future[JSONCollection] = {
