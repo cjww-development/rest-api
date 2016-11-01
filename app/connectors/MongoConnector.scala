@@ -19,7 +19,7 @@ package connectors
 import config.{ConfigurationStrings, MongoConfiguration}
 import play.api.libs.json.OFormat
 import reactivemongo.api.MongoConnection.ParsedURI
-import reactivemongo.api.MongoDriver
+import reactivemongo.api.{MongoConnection, MongoDriver}
 import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.core.nodeset.Authenticate
@@ -34,7 +34,8 @@ object MongoConnector extends MongoConnector with MongoConfiguration with Config
   val credentials = Seq(Authenticate(s"$databaseName", s"$databaseUserName", s"$databasePassword"))
 
   val driver = new MongoDriver
-  val connection = driver.connection(List(s"$databaseUrl"), authentications = credentials)
+  val parsedURI = MongoConnection.parseURI(s"$databaseUrl").get
+  val connection = driver.connection(parsedURI)
   val database = connection.database(s"$databaseName")
 
   def collection(name : String) : Future[JSONCollection] = {
