@@ -31,12 +31,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object MongoConnector extends MongoConnector with MongoConfiguration with ConfigurationStrings {
   // $COVERAGE-OFF$
-  val credentials = Seq(Authenticate(s"$databaseName", s"$databaseUserName", s"$databasePassword"))
-
   val driver = new MongoDriver
   val parsedURI = MongoConnection.parseURI(s"$databaseUrl").get
   val connection = driver.connection(parsedURI)
-  val database = connection.database(s"$databaseName")
+  val database = connection.database(parsedURI.db.get)
 
   def collection(name : String) : Future[JSONCollection] = {
     database.map {
