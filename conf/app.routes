@@ -5,4 +5,7 @@
 POST    /create-new-user            controllers.auth.RegisterController.createUserAccount
 POST    /create-new-org-user        controllers.auth.RegisterController.createOrgAccount
 
+GET     /check-user-name            controllers.auth.RegisterController.checkUserNameUsage
+GET     /check-email                controllers.auth.RegisterController.checkEmailUsage
+
 GET     /individual-user-login      controllers.auth.LoginController.userLogin

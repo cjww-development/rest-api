@@ -55,4 +55,17 @@ trait UserRegisterService {
     }
   }
 
+  def checkUserNameUsage(username : String) : Future[Boolean] = {
+    userRegisterRepo.isUserNameInUse(username) map {
+      case Some(account) => true
+      case None => false
+    }
+  }
+
+  def checkEmailUsage(email : String) : Future[Boolean] = {
+    userRegisterRepo.isEmailInUse(email) map {
+      case Some(account) => true
+      case None => false
+    }
+  }
 }

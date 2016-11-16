@@ -66,10 +66,27 @@ class UserRegisterRepositorySpec extends PlaySpec with OneAppPerSuite with Mocki
       when(mockConnector.create[OrgAccount](Matchers.eq(ORG_ACCOUNTS), Matchers.eq(testOrgData))(Matchers.eq(OrgAccount.format)))
         .thenReturn(Future.successful(mockWR))
 
-      val result = TestRepository.createOrgUser(testOrgData)
+      val result = Await.result(TestRepository.createOrgUser(testOrgData), 5.seconds)
+      result.hasErrors mustBe false
+    }
+  }
 
-      result map {
-        result => assert(!result.hasErrors)
+  "Validating a registration" should {
+    "return an optional account" when {
+      "validating a user name" in new Setup {
+        when(mockConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(Some(testUserData)))
+
+        val result = Await.result(TestRepository.isUserNameInUse("testUserName"), 5.seconds)
+        result mustBe Some(testUserData)
+      }
+
+      "validating a email" in new Setup {
+        when(mockConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(Some(testUserData)))
+
+        val result = Await.result(TestRepository.isEmailInUse("test@email.com"), 5.seconds)
+        result mustBe Some(testUserData)
       }
     }
   }
