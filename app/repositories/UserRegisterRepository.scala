@@ -21,6 +21,7 @@ import connectors.MongoConnector
 import models.auth.{OrgAccount, UserAccount}
 import play.api.libs.json.OFormat
 import reactivemongo.api.commands.WriteResult
+import reactivemongo.bson.BSONDocument
 
 import scala.concurrent.Future
 
@@ -38,5 +39,13 @@ trait UserRegisterRepository extends MongoCollections {
 
   def createOrgUser(newOrgUser : OrgAccount)(implicit format : OFormat[OrgAccount]) : Future[WriteResult] = {
     mongoConnector.create[OrgAccount](ORG_ACCOUNTS, newOrgUser)
+  }
+
+  def isUserNameInUse(username : String)(implicit format: OFormat[UserAccount]) : Future[Option[UserAccount]] = {
+    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("userName" -> username))
+  }
+
+  def isEmailInUse(email : String)(implicit format: OFormat[UserAccount]) : Future[Option[UserAccount]] = {
+    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("email" -> email))
   }
 }

@@ -57,4 +57,33 @@ trait RegisterCtrl extends BackController {
         case NotAuthorised => Future.successful(Forbidden)
       }
   }
+
+  //TODO : TEST THESE CONTROLLERS
+  def checkUserNameUsage : Action[String] = Action.async(parse.text) {
+    implicit request =>
+      authOpenAction {
+        case Authorised =>
+          decryptRequest[String] {
+            username =>
+              userRegisterService.checkUserNameUsage(username) map {
+                usage => Ok(usage.toString)
+              }
+          }
+        case NotAuthorised => Future.successful(Forbidden)
+      }
+  }
+
+  def checkEmailUsage : Action[String] = Action.async(parse.text) {
+    implicit request =>
+      authOpenAction {
+        case Authorised =>
+          decryptRequest[String] {
+            email =>
+              userRegisterService.checkEmailUsage(email) map {
+                usage => Ok(usage.toString)
+              }
+          }
+        case NotAuthorised => Future.successful(Forbidden)
+      }
+  }
 }

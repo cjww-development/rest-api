@@ -24,7 +24,8 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import repositories.UserRegisterRepository
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class UserRegisterServiceSpec extends PlaySpec with MockitoSugar with MongoMocks {
@@ -89,6 +90,42 @@ class UserRegisterServiceSpec extends PlaySpec with MockitoSugar with MongoMocks
 
       result map {
         res => assert(!res)
+      }
+    }
+
+    "validate a registration" when {
+      "given a user name" in new Setup {
+        when(mockUserRegisterRepo.isUserNameInUse(Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(Some(testUserAccount)))
+
+        val result = Await.result(TestService.checkUserNameUsage("testUserName"), 5.seconds)
+        result mustBe true
+      }
+
+      "given an email address" in new Setup {
+        when(mockUserRegisterRepo.isEmailInUse(Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(Some(testUserAccount)))
+
+        val result = Await.result(TestService.checkEmailUsage("test@email.com"), 5.seconds)
+        result mustBe true
+      }
+    }
+
+    "invalidate a registration" when {
+      "given a user name" in new Setup {
+        when(mockUserRegisterRepo.isUserNameInUse(Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(None))
+
+        val result = Await.result(TestService.checkUserNameUsage("testUserName"), 5.seconds)
+        result mustBe false
+      }
+
+      "given an email address" in new Setup {
+        when(mockUserRegisterRepo.isEmailInUse(Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(None))
+
+        val result = Await.result(TestService.checkEmailUsage("test@email.com"), 5.seconds)
+        result mustBe false
       }
     }
   }
