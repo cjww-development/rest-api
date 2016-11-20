@@ -58,7 +58,7 @@ trait MongoConnector extends MongoConfiguration {
     }
   }
 
-  def update[T](collectionName : String, selectedData : BSONDocument, data : T)(implicit format : OFormat[T]) : Future[UpdateWriteResult] = {
+  def update(collectionName : String, selectedData : BSONDocument, data : BSONDocument) : Future[UpdateWriteResult] = {
     collection(collectionName).flatMap {
       _.update(selectedData, data)
     }

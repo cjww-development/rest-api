@@ -14,23 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mocks
+package controllers.account
 
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
-import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
+import controllers.traits.account.AccountDetailsCtrl
+import services.AccountService
 
-trait MongoMocks extends MockitoSugar{
-
-  def mockWriteResult(fails: Boolean = false) : WriteResult = {
-    val m = mock[WriteResult]
-    when(m.ok).thenReturn(!fails)
-    m
-  }
-
-  def mockUpdateWriteResult(fails: Boolean) : UpdateWriteResult = {
-    val m = mock[UpdateWriteResult]
-    when(m.ok).thenReturn(fails)
-    m
-  }
+class AccountDetailsController extends AccountDetailsCtrl {
+  val accountService = AccountService
 }

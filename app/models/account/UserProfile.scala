@@ -14,23 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mocks
+package models.account
 
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
-import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
+import play.api.libs.json.Json
 
-trait MongoMocks extends MockitoSugar{
+case class UserProfile(firstName : String, lastName : String, userName : String, email : String)
 
-  def mockWriteResult(fails: Boolean = false) : WriteResult = {
-    val m = mock[WriteResult]
-    when(m.ok).thenReturn(!fails)
-    m
-  }
-
-  def mockUpdateWriteResult(fails: Boolean) : UpdateWriteResult = {
-    val m = mock[UpdateWriteResult]
-    when(m.ok).thenReturn(fails)
-    m
-  }
+object UserProfile {
+  implicit val format = Json.format[UserProfile]
 }
