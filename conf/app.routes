@@ -9,3 +9,5 @@ GET     /check-user-name            controllers.auth.RegisterController.checkUse
 GET     /check-email                controllers.auth.RegisterController.checkEmailUsage
 
 GET     /individual-user-login      controllers.auth.LoginController.userLogin
+
+POST    /update-profile             controllers.account.AccountDetailsController.updateProfileInformation()

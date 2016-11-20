@@ -16,6 +16,8 @@
 
 package fixtures
 
+import security.JsonSecurity
+
 trait PayloadFixtures {
   final val invalidPayload = "7eqO/a356L5bEcP0NCK5QoblZJmy4RZgzi9FbaWvkbs="
 
@@ -31,4 +33,6 @@ trait PayloadFixtures {
 
   final val invalidLoginPayload =
     "KWeL116d7p7f1H/rMucm27uIgqZuc4xA+uHjYxCZHY/fwoAlOT8d7m/7ozAwkutilfiKbxb2dARYDVeN7bEGtQ=="
+
+  final val encUserName = JsonSecurity.encryptModel[String]("testUserName")
 }

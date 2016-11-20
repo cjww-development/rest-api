@@ -39,7 +39,7 @@ class MongoConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
   val mockCollectionName = "TestCollection"
 
   val mockWriteResult : WriteResult = mockWriteResult()
-  val mockUpdatedWriteResult : UpdateWriteResult = mockUpdateWriteResult()
+  val mockUpdatedWriteResult : UpdateWriteResult = mockUpdateWriteResult(false)
 
   class Setup {
     object TestConnector extends MongoConnector {
@@ -76,7 +76,7 @@ class MongoConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
     }
 
     "update a document" in new Setup {
-      val result = TestConnector.update[TestModel](mockCollectionName, BSONDocument("string" -> "testString"), updatedData)
+      val result = TestConnector.update(mockCollectionName, BSONDocument("string" -> "testString"), BSONDocument())
 
       result.map {
         result => assert(!result.hasErrors)

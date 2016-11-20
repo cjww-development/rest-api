@@ -14,29 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package controllers.traits.auth
+package controllers.traits.account
 
 import config.{Authorised, BackController, NotAuthorised}
-import models.auth.Login
+import models.account.UserProfile
 import play.api.mvc.Action
-import services.LoginService
+import services.AccountService
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
-trait LoginCtrl extends BackController {
+trait AccountDetailsCtrl extends BackController {
 
-  val loginService : LoginService
+  val accountService : AccountService
 
-  def userLogin : Action[String] = Action.async(parse.text) {
+  def updateProfileInformation() : Action[String] = Action.async(parse.text) {
     implicit request =>
       authOpenAction {
         case Authorised =>
-          decryptRequest[Login] {
-            loginData =>
-              loginService.getSingleUser(loginData) map {
-                case unauthorised @ "Unauthorised" => Unauthorized(unauthorised)
-                case payload => Ok(payload)
+          decryptRequest[UserProfile] {
+            profile =>
+              accountService.updateProfileInformation(profile) map {
+                case false => Ok
+                case true => InternalServerError
               }
           }
         case NotAuthorised => Future.successful(Forbidden)
