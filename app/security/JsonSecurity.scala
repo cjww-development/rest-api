@@ -24,6 +24,7 @@ import javax.crypto.spec.SecretKeySpec
 import play.api.libs.json.{Format, JsValue, Json}
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.codec.binary.Base64
+import play.api.Logger
 
 import scala.util.Try
 
@@ -37,7 +38,6 @@ trait JsonSecurity extends JsonCommon {
       cipher.init(Cipher.ENCRYPT_MODE, keyToSpec)
       Some(Base64.encodeBase64String(cipher.doFinal(json.toString.getBytes("UTF-8"))))
     }
-
     scramble(Json.toJson(data))
   }
 
@@ -49,7 +49,9 @@ trait JsonSecurity extends JsonCommon {
       case true =>
         val unlocked = new String(attempt.get)
         validate[T](unlocked)
-      case false => None
+      case false =>
+        Logger.error(s"[JsonSecurity] - [decryptInto] Decrypting input has FAILED ${attempt.failed.get}")
+        None
     }
   }
 }

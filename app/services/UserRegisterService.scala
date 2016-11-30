@@ -34,11 +34,9 @@ trait UserRegisterService {
   def storeNewUser(userAccount : UserAccount) : Future[Boolean] = {
     userRegisterRepo.createNewUser(userAccount) map {
       wr =>
-        if(wr.hasErrors) {
-          // $COVERAGE-OFF$
-          Logger.error(s"[UserRegisterRepo] - [createNewUser] : There was a problem creating a new user - ${wr.errmsg}")
-          // $COVERAGE-ON$
-        }
+        // $COVERAGE-OFF$
+        if(wr.hasErrors) Logger.error(s"[UserRegisterRepo] - [createNewUser] : There was a problem creating a new user - ${wr.errmsg}")
+        // $COVERAGE-ON$
         wr.hasErrors
     }
   }
@@ -46,11 +44,9 @@ trait UserRegisterService {
   def storeNewOrgUser(orgAccount: OrgAccount) : Future[Boolean] = {
     userRegisterRepo.createOrgUser(orgAccount) map {
       wr =>
-        if(wr.hasErrors) {
-          // $COVERAGE-OFF$
-          Logger.error(s"[UserRegisterRepo] - [createOrgUser] : There was a problem creating a new org user = ${wr.errmsg}")
-          // $COVERAGE-ON$
-        }
+        // $COVERAGE-OFF$
+        if(wr.hasErrors) Logger.error(s"[UserRegisterRepo] - [createOrgUser] : There was a problem creating a new org user = ${wr.errmsg}")
+        // $COVERAGE-ON$
         wr.hasErrors
     }
   }

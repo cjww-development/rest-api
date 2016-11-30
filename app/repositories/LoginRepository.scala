@@ -19,9 +19,11 @@ package repositories
 import config.MongoCollections
 import connectors.MongoConnector
 import models.auth.{Login, UserAccount}
+import play.api.Logger
 import reactivemongo.bson.BSONDocument
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object LoginRepository extends LoginRepository {
   val mongoConnector = MongoConnector
@@ -32,6 +34,12 @@ trait LoginRepository extends MongoCollections {
   val mongoConnector : MongoConnector
 
   def validateSingleUser(userDetails : Login) : Future[Option[UserAccount]] = {
-    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("userName" -> userDetails.userName, "password" -> userDetails.password))
+    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("userName" -> userDetails.userName, "password" -> userDetails.password)) map {
+      res =>
+        // $COVERAGE-OFF$
+        Logger.info(s"[LoginRepository] - [validateSingleUser] Found exactly one user against ${userDetails.userName}...retrieving")
+        // $COVERAGE-ON$
+        res
+    }
   }
 }

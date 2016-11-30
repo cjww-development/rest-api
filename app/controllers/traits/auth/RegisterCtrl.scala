@@ -18,7 +18,7 @@ package controllers.traits.auth
 
 import config.{Authorised, BackController, NotAuthorised}
 import models.auth.{OrgAccount, UserAccount}
-import play.api.mvc.{Action, AnyContent}
+import play.api.mvc.Action
 import services.UserRegisterService
 
 import scala.concurrent.ExecutionContext.Implicits.global

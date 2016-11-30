@@ -35,7 +35,7 @@ class UserRegisterServiceSpec extends PlaySpec with MockitoSugar with MongoMocks
   val testUserAccount = UserAccount(Some("testID"),"testFirst","testLast","testUser","testEmail","testPass")
   val testOrgAccount = OrgAccount("testID","testFirst","testLast","testUser","testEmail","testPass")
 
-  val mockSuccessWr = mockWriteResult()
+  val mockSuccessWr = mockWriteResult(false)
   val mockNotSuccessWr = mockWriteResult(true)
 
   class Setup {
