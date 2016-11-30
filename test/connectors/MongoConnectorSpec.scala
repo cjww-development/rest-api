@@ -19,7 +19,7 @@ package connectors
 import mocks.MongoMocks
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
-import org.mockito.Matchers
+import org.mockito.{ArgumentCaptor, Matchers}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
@@ -27,7 +27,8 @@ import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json.collection.JSONCollection
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class MongoConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MongoMocks {
@@ -38,8 +39,11 @@ class MongoConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
   val mockCollection = mock[JSONCollection]
   val mockCollectionName = "TestCollection"
 
-  val mockWriteResult : WriteResult = mockWriteResult()
-  val mockUpdatedWriteResult : UpdateWriteResult = mockUpdateWriteResult(false)
+  val mockWriteResult : WriteResult = mockWriteResult(true)
+  val mockUpdatedWriteResult : UpdateWriteResult = mockUpdateWriteResult(true)
+
+  val mockFailedWR = mockWriteResult(false)
+  val mockFailedUWR = mockUpdateWriteResult(false)
 
   class Setup {
     object TestConnector extends MongoConnector {
@@ -56,38 +60,57 @@ class MongoConnectorSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
   }
 
   "MongoConnector" should {
-    "insert a model into the collection" in new Setup {
-      when(mockCollection.insert[TestModel](Matchers.eq(testData), Matchers.any())(Matchers.any(), Matchers.any()))
-        .thenReturn(Future.successful(mockWriteResult))
+    "not error" when {
+      "inserting a model into the collection" in new Setup {
+        when(mockCollection.insert[TestModel](Matchers.eq(testData), Matchers.any())(Matchers.any(), Matchers.any()))
+          .thenReturn(Future.successful(mockWriteResult))
 
-      val result = TestConnector.create[TestModel](mockCollectionName, testData)
+        val result = Await.result(TestConnector.create[TestModel](mockCollectionName, testData), 5.seconds)
 
-      result.map {
-        result => assert(!result.hasErrors)
+        result.ok mustBe true
+      }
+
+      "updating a document" in new Setup {
+        when(mockCollection.update(Matchers.any(),Matchers.any(),Matchers.any(),Matchers.any(),Matchers.any())(Matchers.any(),Matchers.any(),Matchers.any()))
+          .thenReturn(Future.successful(mockUpdatedWriteResult))
+
+        val result = Await.result(TestConnector.update(mockCollectionName, BSONDocument("string" -> "testString"), BSONDocument()), 5.seconds)
+        result.ok mustBe true
+      }
+
+      "deleting a document" in new Setup {
+        when(mockCollection.remove[TestModel](Matchers.any(),Matchers.any(),Matchers.any())(Matchers.any(),Matchers.any()))
+          .thenReturn(Future.successful(mockUpdatedWriteResult))
+
+        val result = Await.result(TestConnector.delete[TestModel](mockCollectionName, BSONDocument("string" -> "testString")), 5.seconds)
+        result.ok mustBe true
       }
     }
 
-    "fetch a model from the collection" in new Setup {
-      val result = TestConnector.read[TestModel](mockCollectionName, BSONDocument("string" -> "testString"))
+    "return errors" when {
+      "inserting a model into the collection" in new Setup {
+        when(mockCollection.insert[TestModel](Matchers.eq(testData), Matchers.any())(Matchers.any(), Matchers.any()))
+          .thenReturn(Future.successful(mockFailedWR))
 
-      result.map {
-        result => assert(result.get == testData)
+        val result = Await.result(TestConnector.create[TestModel](mockCollectionName, testData), 5.seconds)
+
+        result.ok mustBe false
       }
-    }
 
-    "update a document" in new Setup {
-      val result = TestConnector.update(mockCollectionName, BSONDocument("string" -> "testString"), BSONDocument())
+      "updating a document" in new Setup {
+        when(mockCollection.update(Matchers.any(),Matchers.any(),Matchers.any(),Matchers.any(),Matchers.any())(Matchers.any(),Matchers.any(),Matchers.any()))
+          .thenReturn(Future.successful(mockFailedUWR))
 
-      result.map {
-        result => assert(!result.hasErrors)
+        val result = Await.result(TestConnector.update(mockCollectionName, BSONDocument("string" -> "testString"), BSONDocument()), 5.seconds)
+        result.ok mustBe false
       }
-    }
 
-    "delete a document" in new Setup {
-      val result = TestConnector.delete[TestModel](mockCollectionName, BSONDocument("string" -> "testString"))
+      "deleting a document" in new Setup {
+        when(mockCollection.remove[TestModel](Matchers.any(), Matchers.any(), Matchers.any())(Matchers.any(), Matchers.any()))
+          .thenReturn(Future.successful(mockFailedWR))
 
-      result.map {
-        result => assert(!result.hasErrors)
+        val result = Await.result(TestConnector.delete[TestModel](mockCollectionName, BSONDocument("string" -> "testString")), 5.seconds)
+        result.ok mustBe false
       }
     }
   }

@@ -19,11 +19,13 @@ package repositories
 import config.MongoCollections
 import connectors.MongoConnector
 import models.auth.{OrgAccount, UserAccount}
+import play.api.Logger
 import play.api.libs.json.OFormat
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.BSONDocument
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object UserRegisterRepository extends UserRegisterRepository {
   val mongoConnector = MongoConnector
@@ -42,10 +44,22 @@ trait UserRegisterRepository extends MongoCollections {
   }
 
   def isUserNameInUse(username : String)(implicit format: OFormat[UserAccount]) : Future[Option[UserAccount]] = {
-    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("userName" -> username))
+    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("userName" -> username)) map {
+      res =>
+        // $COVERAGE-OFF$
+        if(res.isDefined) Logger.info(s"[UserRegisterRepository] - [isUserNameInUse] The user name $username is already in use on this system")
+        // $COVERAGE-ON$
+        res
+    }
   }
 
   def isEmailInUse(email : String)(implicit format: OFormat[UserAccount]) : Future[Option[UserAccount]] = {
-    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("email" -> email))
+    mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("email" -> email)) map {
+      res =>
+        // $COVERAGE-OFF$
+        if(res.isDefined) Logger.info(s"[UserRegisterRepository] - [isEmailInUse] The email address $email is already in use on this system")
+        // $COVERAGE-ON$
+        res
+    }
   }
 }

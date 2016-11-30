@@ -21,7 +21,7 @@ import connectors.MongoConnector
 import models.account.UserProfile
 import reactivemongo.api.commands.UpdateWriteResult
 import reactivemongo.bson._
-import play.modules.reactivemongo.json._, ImplicitBSONHandlers._
+import play.api.Logger
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,6 +42,12 @@ trait AccountDetailsRepository extends MongoCollections {
         "email" -> userProfile.email
       )
     )
-    mongoConnector.update(USER_ACCOUNTS, selector, updatedData)
+    mongoConnector.update(USER_ACCOUNTS, selector, updatedData) map {
+      res =>
+        // $COVERAGE-OFF$
+        if(res.hasErrors) Logger.error(s"[AccountDetailsRepository] - [updateAccountData] : Update failed - reason : ${res.errmsg.get}")
+        // $COVERAGE-ON$
+        res
+    }
   }
 }

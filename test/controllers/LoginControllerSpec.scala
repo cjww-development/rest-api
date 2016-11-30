@@ -53,12 +53,10 @@ class LoginControllerSpec extends PlaySpec with OneAppPerSuite with RequestFixtu
   "Sending a GET request to userLogin" should {
     "return a forbidden if no appID is found" in new Setup {
       val result = testController.userLogin()(forbiddenRequest)
-
       status(result.run()) mustBe FORBIDDEN
     }
 
     "return an unauthorised if the users credentials can't be validated" in new Setup {
-
       when(mockLoginService.getSingleUser(Matchers.eq(testInvalidLogin)))
         .thenReturn(Future.successful("Unauthorised"))
 
@@ -68,7 +66,6 @@ class LoginControllerSpec extends PlaySpec with OneAppPerSuite with RequestFixtu
     }
 
     "return an ok with the details to hold in the session if the user is successful validated" in new Setup {
-
       when(mockLoginService.getSingleUser(Matchers.eq(testLogin)))
         .thenReturn(Future.successful(testLogin.toString))
 

@@ -17,6 +17,7 @@
 package services
 
 import models.auth.{Login, UserAccount}
+import play.api.Logger
 import repositories.LoginRepository
 import security.JsonSecurity
 
@@ -33,8 +34,12 @@ trait LoginService {
 
   def getSingleUser(userDetails : Login) : Future[String] = {
     loginRepository.validateSingleUser(userDetails).map {
-      case Some(user) => JsonSecurity.encryptModel[UserAccount](user).getOrElse("Unauthorised")
-      case None => "Unauthorised"
+      case Some(user) =>
+        Logger.info(s"[LoginService] - [getSingleUser] login attempt successful responding with user")
+        JsonSecurity.encryptModel[UserAccount](user).getOrElse("Unauthorised")
+      case None =>
+        Logger.info(s"[LoginService] - [getSingleUser] login attempt unsuccessful responding with FORBIDDEN - 403")
+        "Unauthorised"
     }
   }
 }

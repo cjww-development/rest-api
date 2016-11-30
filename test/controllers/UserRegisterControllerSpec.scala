@@ -143,4 +143,44 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
       status(result) mustBe CREATED
     }
   }
+
+  "checkUserNameUsage" should {
+    "return a FORBIDDEN if appID cannot be found in the header" in new Setup {
+      val result = testController.checkUserNameUsage()(FakeRequest()
+        .withHeaders(CONTENT_TYPE -> TEXT))
+
+      status(result.run()) mustBe FORBIDDEN
+    }
+
+    "return a OK with the usage" in new Setup {
+      when(mockUserRegisterService.checkUserNameUsage(Matchers.eq("testUserName")))
+        .thenReturn(Future.successful(false))
+
+      val result = testController.checkUserNameUsage()(FakeRequest()
+        .withHeaders(CONTENT_TYPE -> TEXT, "appID" -> AUTH_ID)
+        .withBody(encUserName))
+
+      status(result) mustBe OK
+    }
+  }
+
+  "checkEmailUsage" should {
+    "return a FORBIDDEN if appID cannot be found in the header" in new Setup {
+      val result = testController.checkEmailUsage()(FakeRequest()
+        .withHeaders(CONTENT_TYPE -> TEXT))
+
+      status(result.run()) mustBe FORBIDDEN
+    }
+
+    "return a OK with the usage" in new Setup {
+      when(mockUserRegisterService.checkEmailUsage(Matchers.eq("testUserName")))
+        .thenReturn(Future.successful(false))
+
+      val result = testController.checkEmailUsage()(FakeRequest()
+        .withHeaders(CONTENT_TYPE -> TEXT, "appID" -> AUTH_ID)
+        .withBody(encUserName))
+
+      status(result) mustBe OK
+    }
+  }
 }

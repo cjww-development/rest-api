@@ -16,23 +16,27 @@
 
 package fixtures
 
+import models.account.UserProfile
 import security.JsonSecurity
 
 trait PayloadFixtures {
-  final val invalidPayload = "7eqO/a356L5bEcP0NCK5QoblZJmy4RZgzi9FbaWvkbs="
+  lazy val invalidPayload = "7eqO/a356L5bEcP0NCK5QoblZJmy4RZgzi9FbaWvkbs="
 
 
-  final val validUserAccountPayload =
+  lazy val validUserAccountPayload =
     "el76E6N/MRiD8mQknEb4DhpzyCxOOMOGmrrmDgYNAkcVlJhUc7eXbqqDiAnmfmzG+wLE/Gq17b9cnrpiEeR3rEP+ktkCdDGLMcUzcEUKc+pbtzkFc0EAB/2ahFZM0VWjRusnE3mmkVk/e25y+EEs3cgJO0tqRcx26Xt7kSWz+9nWfmxrUYDkAcjasNL7rehiRryCE74/XNowkfP17F66ZQ=="
-  final val validOrgAccountPayload =
+  lazy val validOrgAccountPayload =
     "2m1oEtWLRtIinCfWtQ8ateRtRxRj/whU1lmL3ciZ8j1pvB3JlLRiWRKnFLFma25zmZ/FWVmKRZw8hv5WRHeqx45Sk6ipLEGmR1BM98FahOpusKrBBv2bSiFlew4bfTDpKdCEJS+8ymBoVjJxaC5/lJZcPevTWqxeEl13TX42ZY342sXpC22fUZuppirlFB2m++jHsSam4YGc9qxeayN5AA=="
 
 
-  final val validLoginPayload =
+  lazy val validLoginPayload =
     "KWeL116d7p7f1H/rMucm20P2dgCjsMnKlF9BMXWXgD06hMTOXVWlH23qhShNllRmq4lUaalTAcf05En1NJBhTA=="
 
-  final val invalidLoginPayload =
+  lazy val invalidLoginPayload =
     "KWeL116d7p7f1H/rMucm27uIgqZuc4xA+uHjYxCZHY/fwoAlOT8d7m/7ozAwkutilfiKbxb2dARYDVeN7bEGtQ=="
 
-  final val encUserName = JsonSecurity.encryptModel[String]("testUserName")
+  lazy val encUserName = JsonSecurity.encryptModel[String]("testUserName").get
+
+  lazy val validUserProfilePayload = JsonSecurity.encryptModel[UserProfile](UserProfile("testFirst","testLast","testUser","testEmail")).get
+  lazy val validUserProfileModel = UserProfile("testFirst","testLast","testUser","testEmail")
 }

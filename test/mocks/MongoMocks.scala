@@ -22,15 +22,15 @@ import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
 
 trait MongoMocks extends MockitoSugar{
 
-  def mockWriteResult(fails: Boolean = false) : WriteResult = {
-    val m = mock[WriteResult]
-    when(m.ok).thenReturn(!fails)
-    m
+  def mockWriteResult(success: Boolean) : WriteResult = {
+    val mockResult = mock[WriteResult]
+    when(mockResult.ok).thenReturn(success)
+    mockResult
   }
 
-  def mockUpdateWriteResult(fails: Boolean) : UpdateWriteResult = {
-    val m = mock[UpdateWriteResult]
-    when(m.ok).thenReturn(fails)
-    m
+  def mockUpdateWriteResult(success: Boolean) : UpdateWriteResult = {
+    val mockResult = mock[UpdateWriteResult]
+    when(mockResult.ok).thenReturn(success)
+    mockResult
   }
 }
