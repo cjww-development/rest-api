@@ -37,7 +37,7 @@ trait LoginRepository extends MongoCollections {
     mongoConnector.read[UserAccount](USER_ACCOUNTS, BSONDocument("userName" -> userDetails.userName, "password" -> userDetails.password)) map {
       res =>
         // $COVERAGE-OFF$
-        Logger.info(s"[LoginRepository] - [validateSingleUser] Found exactly one user against ${userDetails.userName}...retrieving")
+        if(res.isDefined) Logger.info(s"[LoginRepository] - [validateSingleUser] User validated, retrieving user information")
         // $COVERAGE-ON$
         res
     }
