@@ -88,4 +88,21 @@ class AccountDetailsControllerSpec extends PlaySpec with OneAppPerSuite with Moc
       }
     }
   }
+
+  "updateUserPassword" should {
+    "return FORBIDDEN" when {
+      "POSTing without an appID" in new Setup {
+        val result = testController.updateUserPassword()(FakeRequest().withHeaders(CONTENT_TYPE -> "text/plain")).run()
+        status(result) mustBe FORBIDDEN
+      }
+    }
+
+    "return a bad request" when {
+      "given an invalid encrypted value" in new Setup {
+        val request = FakeRequest().withHeaders(CONTENT_TYPE -> "text/plain", "appID" -> AUTH_ID).withBody("invalidEncValue")
+        val result = testController.updateUserPassword()(request)
+        status(result) mustBe BAD_REQUEST
+      }
+    }
+  }
 }

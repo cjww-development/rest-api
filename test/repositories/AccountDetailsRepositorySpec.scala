@@ -18,7 +18,8 @@ package repositories
 
 import connectors.MongoConnector
 import mocks.MongoMocks
-import models.account.UserProfile
+import models.account.{UpdatedPassword, UserProfile}
+import models.auth.UserAccount
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.mockito.Mockito._
@@ -58,6 +59,58 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
 
         val result = Await.result(TestRepository.updateAccountData(testData), 5.seconds)
         result mustBe failedUWR
+      }
+    }
+  }
+
+  "findPassword" should {
+    "return false" when {
+      "a matching user cannot be found" in new Setup {
+        when(mockMongoConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(None))
+
+        val set = UpdatedPassword("testUserId", "testOldPassword", "testNewPassword")
+
+        val result = Await.result(TestRepository.findPassword(set), 5.seconds)
+        result mustBe false
+      }
+
+      "a matching users password does not match the old password from the set" in new Setup {
+        val user = UserAccount(Some("testUserId"), "testFirstName","testLastName","testUserName","testEmail","testPassword")
+        val set = UpdatedPassword("testUserId", "testOldPassword", "testNewPassword")
+
+        when(mockMongoConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(Some(user)))
+
+        val result = Await.result(TestRepository.findPassword(set), 5.seconds)
+        result mustBe false
+      }
+    }
+
+    "return true" when {
+      "a matching user is found and their password the old password from the set" in new Setup {
+        val user = UserAccount(Some("testUserId"), "testFirstName","testLastName","testUserName","testEmail","testPassword")
+        val set = UpdatedPassword("testUserId", "testPassword", "testNewPassword")
+
+        when(mockMongoConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(Some(user)))
+
+        val result = Await.result(TestRepository.findPassword(set), 5.seconds)
+        result mustBe true
+      }
+    }
+  }
+
+  "updatePassword" should {
+    "return an UpdateWriteResult" when {
+      "given a password set" in new Setup {
+        when(mockMongoConnector.update(Matchers.any(), Matchers.any(), Matchers.any()))
+          .thenReturn(Future.successful(successUWR))
+
+        val set = UpdatedPassword("testUserId", "testPassword", "testNewPassword")
+
+        val result = Await.result(TestRepository.updatePassword(set), 5.seconds)
+        result mustBe successUWR
       }
     }
   }
