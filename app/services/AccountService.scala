@@ -16,11 +16,15 @@
 
 package services
 
-import models.account.UserProfile
+import models.account.{UpdatedPassword, UserProfile}
 import repositories.AccountDetailsRepository
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+
+sealed trait UpdatedPasswordResponse
+case object InvalidOldPassword extends UpdatedPasswordResponse
+case class PasswordUpdate(success : Boolean) extends UpdatedPasswordResponse
 
 object AccountService extends AccountService {
   val accountDetailsRepo = AccountDetailsRepository
@@ -33,6 +37,15 @@ trait AccountService {
   def updateProfileInformation(userProfile: UserProfile) : Future[Boolean] = {
     accountDetailsRepo.updateAccountData(userProfile) map {
       _.hasErrors
+    }
+  }
+
+  def updatePassword(passwordSet : UpdatedPassword) : Future[UpdatedPasswordResponse] = {
+    accountDetailsRepo.findPassword(passwordSet) flatMap {
+      case false => Future.successful(InvalidOldPassword)
+      case true => accountDetailsRepo.updatePassword(passwordSet) map {
+        updated => PasswordUpdate(updated.hasErrors)
+      }
     }
   }
 }

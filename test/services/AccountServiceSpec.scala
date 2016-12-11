@@ -17,7 +17,7 @@
 package services
 
 import mocks.MongoMocks
-import models.account.UserProfile
+import models.account.{UpdatedPassword, UserProfile}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.mockito.Mockito._
@@ -49,6 +49,35 @@ class AccountServiceSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
 
       val result = Await.result(TestService.updateProfileInformation(testData), 5.seconds)
       result mustBe false
+    }
+  }
+
+  "updatePassword" should {
+    "return an InvalidOldPassword" when {
+      "the previous password in the set does not match the password in mongo" in new Setup {
+        when(mockAccountDetailsRepo.findPassword(Matchers.any()))
+          .thenReturn(Future.successful(false))
+
+        val set = UpdatedPassword("testUserId","testOldPassword","testNewPassword")
+
+        val result = Await.result(TestService.updatePassword(set), 5.seconds)
+        result mustBe InvalidOldPassword
+      }
+    }
+
+    "return a PasswordUpdate" when {
+      "the password has been updated" in new Setup {
+        when(mockAccountDetailsRepo.findPassword(Matchers.any()))
+          .thenReturn(Future.successful(true))
+
+        when(mockAccountDetailsRepo.updatePassword(Matchers.any()))
+          .thenReturn(Future.successful(successUWR))
+
+        val set = UpdatedPassword("testUserId","testOldPassword","testNewPassword")
+
+        val result = Await.result(TestService.updatePassword(set), 5.seconds)
+        result mustBe PasswordUpdate(false)
+      }
     }
   }
 }
