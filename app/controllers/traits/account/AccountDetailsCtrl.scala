@@ -50,7 +50,7 @@ trait AccountDetailsCtrl extends BackController {
           decryptRequest[UpdatedPassword] {
             passwordSet =>
               accountService.updatePassword(passwordSet) map {
-                case InvalidOldPassword => BadRequest
+                case InvalidOldPassword => Conflict
                 case PasswordUpdate(success) => success match {
                   case true => InternalServerError
                   case false => Ok
