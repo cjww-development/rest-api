@@ -18,7 +18,7 @@ package repositories
 
 import connectors.MongoConnector
 import mocks.MongoMocks
-import models.account.{UpdatedPassword, UserProfile}
+import models.account.{AccountSettings, UpdatedPassword, UserProfile}
 import models.auth.UserAccount
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -35,7 +35,7 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
   val successUWR = mockUpdateWriteResult(false)
   val failedUWR = mockUpdateWriteResult(true)
 
-  val testData = UserProfile("testFirstName", "testLastName", "testUserName", "test@email.com")
+  val testData = UserProfile("testFirstName", "testLastName", "testUserName", "test@email.com", None, None)
 
   class Setup {
     object TestRepository extends AccountDetailsRepository {
@@ -76,7 +76,7 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
       }
 
       "a matching users password does not match the old password from the set" in new Setup {
-        val user = UserAccount(Some("testUserId"), "testFirstName","testLastName","testUserName","testEmail","testPassword")
+        val user = UserAccount(Some("testUserId"), "testFirstName","testLastName","testUserName","testEmail","testPassword", None)
         val set = UpdatedPassword("testUserId", "testOldPassword", "testNewPassword")
 
         when(mockMongoConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
@@ -89,7 +89,7 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
 
     "return true" when {
       "a matching user is found and their password the old password from the set" in new Setup {
-        val user = UserAccount(Some("testUserId"), "testFirstName","testLastName","testUserName","testEmail","testPassword")
+        val user = UserAccount(Some("testUserId"), "testFirstName","testLastName","testUserName","testEmail","testPassword", None)
         val set = UpdatedPassword("testUserId", "testPassword", "testNewPassword")
 
         when(mockMongoConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
@@ -110,6 +110,20 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
         val set = UpdatedPassword("testUserId", "testPassword", "testNewPassword")
 
         val result = Await.result(TestRepository.updatePassword(set), 5.seconds)
+        result mustBe successUWR
+      }
+    }
+  }
+
+  "updateSettings" should {
+    "return an UpdateWriteResult" when {
+      "given an AccountSetting" in new Setup {
+        when(mockMongoConnector.update(Matchers.any(), Matchers.any(), Matchers.any()))
+          .thenReturn(Future.successful(successUWR))
+
+        val settings = AccountSettings("testUserId", Map("displayName" -> "testValue"))
+
+        val result = Await.result(TestRepository.updateSettings(settings), 5.seconds)
         result mustBe successUWR
       }
     }

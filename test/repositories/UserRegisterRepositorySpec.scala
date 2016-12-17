@@ -34,7 +34,7 @@ class UserRegisterRepositorySpec extends PlaySpec with OneAppPerSuite with Mocki
 
   val mockConnector = mock[MongoConnector]
 
-  val testUserData = UserAccount(None, "testFirstName", "testLastName", "testUserName", "test@email.com", "testPassword")
+  val testUserData = UserAccount(None, "testFirstName", "testLastName", "testUserName", "test@email.com", "testPassword", None)
   val testOrgData = OrgAccount("testOAccId", "testOrgName", "testOrgUserName", "testInitials", "test@email.com", "testPassword")
 
   val mockWR : WriteResult = mockWriteResult(false)

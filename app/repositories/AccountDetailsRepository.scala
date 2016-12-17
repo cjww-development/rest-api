@@ -18,7 +18,7 @@ package repositories
 
 import config.MongoCollections
 import connectors.MongoConnector
-import models.account.{UpdatedPassword, UserProfile}
+import models.account.{AccountSettings, UpdatedPassword, UserProfile}
 import models.auth.UserAccount
 import reactivemongo.api.commands.UpdateWriteResult
 import reactivemongo.bson._
@@ -64,6 +64,18 @@ trait AccountDetailsRepository extends MongoCollections {
       res =>
         // $COVERAGE-OFF$
         if(res.hasErrors) Logger.error(s"[AccountDetailsRepository] - [updatePassword] : Update failed - reason : ${res.errmsg.get}")
+        // $COVERAGE-ON$
+        res
+    }
+  }
+
+  def updateSettings(accSettings : AccountSettings) : Future[UpdateWriteResult] = {
+    val selector = BSONDocument("_id" -> accSettings.userId)
+    val updatedData = BSONDocument("$set" -> BSONDocument("settings" -> BSONDocument("displayName" -> accSettings.settings("displayName"))))
+    mongoConnector.update(USER_ACCOUNTS, selector, updatedData) map {
+      res =>
+        // $COVERAGE-OFF$
+        if(res.hasErrors) Logger.error(s"[AccountDetailsRepository] - [updateSettings] : Update failed - reason : ${res.errmsg.get}")
         // $COVERAGE-ON$
         res
     }
