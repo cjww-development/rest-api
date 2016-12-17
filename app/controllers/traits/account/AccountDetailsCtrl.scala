@@ -17,9 +17,9 @@
 package controllers.traits.account
 
 import config.{Authorised, BackController, NotAuthorised}
-import models.account.{UpdatedPassword, UserProfile}
+import models.account.{AccountSettings, UpdatedPassword, UserProfile}
 import play.api.mvc.Action
-import services.{AccountService, InvalidOldPassword, PasswordUpdate}
+import services._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -55,6 +55,21 @@ trait AccountDetailsCtrl extends BackController {
                   case true => InternalServerError
                   case false => Ok
                 }
+              }
+          }
+        case NotAuthorised => Future.successful(Forbidden)
+      }
+  }
+
+  def updateUserSettings() : Action[String] = Action.async(parse.text) {
+    implicit request =>
+      authOpenAction {
+        case Authorised =>
+          decryptRequest[AccountSettings] {
+            settings =>
+              accountService.updateSettings(settings) map {
+                case UpdatedSettingsSuccess => Ok
+                case UpdatedSettingsFailed => InternalServerError
               }
           }
         case NotAuthorised => Future.successful(Forbidden)

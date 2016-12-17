@@ -16,16 +16,41 @@
 
 package models.auth
 
-import play.api.libs.json.Json
+import org.joda.time.{DateTime, DateTimeZone}
+import play.api.libs.json._
 import services.AccountIdService
 
-case class UserAccount(_id : Option[String], firstName : String, lastName : String, userName : String, email : String, password : String)
-  extends AccountIdService {
-  def withAccountID : UserAccount = {
-    this.copy(_id = generateAccountID)
+case class UserAccount(_id : Option[String],
+                       firstName : String,
+                       lastName : String,
+                       userName : String,
+                       email : String,
+                       password : String,
+                       settings : Option[Map[String, String]] = None,
+                       details : Option[Map[String, DateTime]] = None) extends AccountIdService {
+
+  def withDetail : UserAccount = {
+    this.copy(_id = generateAccountID, details = Some(Map("createdAt" -> UserAccount.getDateTime)))
   }
 }
 
 object UserAccount {
+
+  implicit val dateTimeRead: Reads[DateTime] =
+    (__ \ "$date").read[Long].map { dateTime =>
+      new DateTime(dateTime, DateTimeZone.UTC)
+    }
+
+  implicit val dateTimeWrite: Writes[DateTime] = new Writes[DateTime] {
+    def writes(dateTime: DateTime): JsValue = Json.obj(
+      "$date" -> dateTime.getMillis
+    )
+  }
+
   implicit val format = Json.format[UserAccount]
+
+  def getDateTime : DateTime = {
+    val milliseconds = DateTime.now
+    new DateTime(milliseconds.getMillis, DateTimeZone.UTC)
+  }
 }

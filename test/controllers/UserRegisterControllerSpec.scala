@@ -39,7 +39,7 @@ class UserRegisterControllerSpec extends PlaySpec with OneAppPerSuite with Mocki
 
   val mockUserRegisterService = mock[UserRegisterService]
 
-  val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword")
+  val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword", None)
   val testOrgAccData = OrgAccount("testAccID","testFirstName","testLastName","testUserName","test@email.com","testPassword")
 
   implicit val system = ActorSystem()

@@ -37,6 +37,6 @@ trait PayloadFixtures {
 
   lazy val encUserName = JsonSecurity.encryptModel[String]("testUserName").get
 
-  lazy val validUserProfilePayload = JsonSecurity.encryptModel[UserProfile](UserProfile("testFirst","testLast","testUser","testEmail")).get
-  lazy val validUserProfileModel = UserProfile("testFirst","testLast","testUser","testEmail")
+  lazy val validUserProfilePayload = JsonSecurity.encryptModel[UserProfile](UserProfile("testFirst","testLast","testUser","testEmail", None, None)).get
+  lazy val validUserProfileModel = UserProfile("testFirst","testLast","testUser","testEmail", None, None)
 }

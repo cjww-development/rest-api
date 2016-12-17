@@ -17,7 +17,7 @@
 package services
 
 import mocks.MongoMocks
-import models.account.{UpdatedPassword, UserProfile}
+import models.account.{AccountSettings, UpdatedPassword, UserProfile}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.mockito.Mockito._
@@ -31,7 +31,7 @@ class AccountServiceSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
 
   val mockAccountDetailsRepo = mock[AccountDetailsRepository]
 
-  val testData = UserProfile("testFirstName","testLastName","testUserName","test@email.com")
+  val testData = UserProfile("testFirstName","testLastName","testUserName","test@email.com", None, None)
 
   val successUWR = mockUpdateWriteResult(false)
   val failedUWR = mockUpdateWriteResult(true)
@@ -77,6 +77,20 @@ class AccountServiceSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
 
         val result = Await.result(TestService.updatePassword(set), 5.seconds)
         result mustBe PasswordUpdate(false)
+      }
+    }
+  }
+
+  "updateSettings" should {
+    "return an UpdatedSettingsResponse" when {
+      "given an AccountSettings" in new Setup {
+        when(mockAccountDetailsRepo.updateSettings(Matchers.any()))
+          .thenReturn(Future.successful(successUWR))
+
+        val settings = AccountSettings("testUserId", Map("displayName" -> "testValue"))
+
+        val result = Await.result(TestService.updateSettings(settings), 5.seconds)
+        result mustBe UpdatedSettingsSuccess
       }
     }
   }

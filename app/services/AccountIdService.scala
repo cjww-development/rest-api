@@ -23,6 +23,6 @@ import security.JsonSecurity
 
 trait AccountIdService extends JsonSecurity {
   def generateAccountID : Option[String] = {
-    encryptModel[String](s"${UUID.randomUUID()}${DateTime.now()}")
+    Some(s"user-${UUID.randomUUID()}")
   }
 }

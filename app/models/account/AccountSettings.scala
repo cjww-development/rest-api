@@ -16,16 +16,10 @@
 
 package models.account
 
-import org.joda.time.DateTime
 import play.api.libs.json.Json
 
-case class UserProfile(firstName : String,
-                       lastName : String,
-                       userName : String,
-                       email : String,
-                       settings : Option[Map[String, String]],
-                       details : Option[Map[String,DateTime]])
+case class AccountSettings(userId : String, settings : Map[String, String])
 
-object UserProfile {
-  implicit val format = Json.format[UserProfile]
+object AccountSettings {
+  implicit val format = Json.format[AccountSettings]
 }
