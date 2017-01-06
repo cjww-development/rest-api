@@ -48,6 +48,15 @@ class AccountDetailsControllerSpec extends PlaySpec with OneAppPerSuite with Moc
     val testController = new TestController
   }
 
+  "getAccountData" should {
+    "return FORBIDDEN" when {
+      "getting without an appID" in new Setup {
+        val result = testController.getAccountData()(FakeRequest().withHeaders(CONTENT_TYPE -> "text/plain")).run()
+        status(result) mustBe FORBIDDEN
+      }
+    }
+  }
+
   "updateProfileInformation" should {
     "return FORBIDDEN" when {
       "POSTing without an appID" in new Setup {

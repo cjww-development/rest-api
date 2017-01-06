@@ -36,10 +36,23 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
   val failedUWR = mockUpdateWriteResult(true)
 
   val testData = UserProfile("testFirstName", "testLastName", "testUserName", "test@email.com", None, None)
+  val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword", None)
 
   class Setup {
     object TestRepository extends AccountDetailsRepository {
       val mongoConnector = mockMongoConnector
+    }
+  }
+
+  "getAccount" should {
+    "return an optional user account" when {
+      "given a userID" in new Setup {
+        when(mockMongoConnector.read[UserAccount](Matchers.any(), Matchers.any())(Matchers.any()))
+          .thenReturn(Future.successful(Some(testAccData)))
+
+        val result = Await.result(TestRepository.getAccount("testAccID"), 5.seconds)
+        result mustBe Some(testAccData)
+      }
     }
   }
 
@@ -121,7 +134,7 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
         when(mockMongoConnector.update(Matchers.any(), Matchers.any(), Matchers.any()))
           .thenReturn(Future.successful(successUWR))
 
-        val settings = AccountSettings("testUserId", Map("displayName" -> "testValue"))
+        val settings = AccountSettings("testUserId", Map("displayName" -> "testValue", "displayNameColour" -> "#FFFFFF"))
 
         val result = Await.result(TestRepository.updateSettings(settings), 5.seconds)
         result mustBe successUWR

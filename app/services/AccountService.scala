@@ -17,7 +17,9 @@
 package services
 
 import models.account.{AccountSettings, UpdatedPassword, UserProfile}
+import models.auth.UserAccount
 import repositories.AccountDetailsRepository
+import security.JsonSecurity
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,6 +39,15 @@ object AccountService extends AccountService {
 trait AccountService {
 
   val accountDetailsRepo : AccountDetailsRepository
+
+  def getAccount(userID : String) : Future[Option[String]] = {
+    accountDetailsRepo.getAccount(userID) map {
+      acc => acc.isDefined match {
+        case false => None
+        case true => JsonSecurity.encryptModel[UserAccount](acc.get)
+      }
+    }
+  }
 
   def updateProfileInformation(userProfile: UserProfile) : Future[Boolean] = {
     accountDetailsRepo.updateAccountData(userProfile) map {

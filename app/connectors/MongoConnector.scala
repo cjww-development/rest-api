@@ -71,6 +71,20 @@ trait MongoConnector extends MongoConfiguration {
   }
   // $COVERAGE-ON$
 
+  // $COVERAGE-OFF$
+  def readBulk[T](collectionName : String, query : BSONDocument, maxDocs : Int)(implicit format : OFormat[T]) : Future[Option[List[T]]] = {
+    collection(collectionName).flatMap {
+      _.find(query).cursor[T].collect[List](maxDocs). map {
+        res =>
+          res.isEmpty match {
+            case true => None
+            case false => Some(res)
+          }
+      }
+    }
+  }
+  // $COVERAGE-ON$
+
   def update(collectionName : String, selectedData : BSONDocument, data : BSONDocument) : Future[UpdateWriteResult] = {
     collection(collectionName).flatMap {
       _.update(selectedData, data) map {

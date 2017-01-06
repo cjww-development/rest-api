@@ -18,11 +18,14 @@ package services
 
 import mocks.MongoMocks
 import models.account.{AccountSettings, UpdatedPassword, UserProfile}
+import models.auth.UserAccount
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.mockito.Mockito._
 import org.mockito.Matchers
+import play.api.libs.json.Json
 import repositories.AccountDetailsRepository
+import security.JsonSecurity
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
@@ -32,6 +35,8 @@ class AccountServiceSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
   val mockAccountDetailsRepo = mock[AccountDetailsRepository]
 
   val testData = UserProfile("testFirstName","testLastName","testUserName","test@email.com", None, None)
+  val testAccData = UserAccount(Some("testAccID"),"testFirstName","testLastName","testUserName","test@email.com","testPassword", None)
+
 
   val successUWR = mockUpdateWriteResult(false)
   val failedUWR = mockUpdateWriteResult(true)
@@ -39,6 +44,26 @@ class AccountServiceSpec extends PlaySpec with OneAppPerSuite with MockitoSugar 
   class Setup {
     object TestService extends AccountService {
       val accountDetailsRepo = mockAccountDetailsRepo
+    }
+  }
+
+  "getAccount" should {
+    "return an optional string" when {
+      "given a userID" in new Setup {
+        when(mockAccountDetailsRepo.getAccount(Matchers.any()))
+          .thenReturn(Future.successful(Some(testAccData)))
+
+        val result = Await.result(TestService.getAccount("testAccID"), 5.seconds)
+        result mustBe JsonSecurity.encryptModel(testAccData)
+      }
+
+      "given a userID but it cant find an account" in new Setup {
+        when(mockAccountDetailsRepo.getAccount(Matchers.any()))
+          .thenReturn(Future.successful(None))
+
+        val result = Await.result(TestService.getAccount("testAccID"), 5.seconds)
+        result mustBe None
+      }
     }
   }
 
