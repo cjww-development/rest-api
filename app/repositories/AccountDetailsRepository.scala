@@ -34,6 +34,11 @@ object AccountDetailsRepository extends AccountDetailsRepository {
 trait AccountDetailsRepository extends MongoCollections {
   val mongoConnector : MongoConnector
 
+  def getAccount(userID : String) : Future[Option[UserAccount]] = {
+    val selector = BSONDocument("_id" -> userID)
+    mongoConnector.read[UserAccount](USER_ACCOUNTS, selector)
+  }
+
   def updateAccountData(userProfile: UserProfile) : Future[UpdateWriteResult] = {
     val selector = BSONDocument("userName" -> userProfile.userName)
     val updatedData = BSONDocument("$set" -> BSONDocument("firstName" -> userProfile.firstName,"lastName" -> userProfile.lastName,"email" -> userProfile.email))
@@ -71,7 +76,16 @@ trait AccountDetailsRepository extends MongoCollections {
 
   def updateSettings(accSettings : AccountSettings) : Future[UpdateWriteResult] = {
     val selector = BSONDocument("_id" -> accSettings.userId)
-    val updatedData = BSONDocument("$set" -> BSONDocument("settings" -> BSONDocument("displayName" -> accSettings.settings("displayName"))))
+    val updatedData =
+      BSONDocument(
+        "$set" -> BSONDocument(
+          "settings" -> BSONDocument(
+            "displayName" -> accSettings.settings("displayName"),
+            "displayNameColour" -> accSettings.settings("displayNameColour")
+          )
+        )
+      )
+
     mongoConnector.update(USER_ACCOUNTS, selector, updatedData) map {
       res =>
         // $COVERAGE-OFF$

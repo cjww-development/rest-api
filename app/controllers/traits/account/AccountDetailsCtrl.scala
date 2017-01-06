@@ -28,6 +28,21 @@ trait AccountDetailsCtrl extends BackController {
 
   val accountService : AccountService
 
+  def getAccountData : Action[String] = Action.async(parse.text) {
+    implicit request =>
+      authOpenAction {
+        case Authorised =>
+          decryptRequest[String] {
+            userID =>
+              accountService.getAccount(userID) map {
+                case Some(acc) => Ok(acc)
+                case None => InternalServerError
+              }
+          }
+        case NotAuthorised => Future.successful(Forbidden)
+      }
+  }
+
   def updateProfileInformation() : Action[String] = Action.async(parse.text) {
     implicit request =>
       authOpenAction {

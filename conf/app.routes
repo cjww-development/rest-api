@@ -8,8 +8,12 @@ POST    /create-new-org-user        controllers.auth.RegisterController.createOr
 GET     /check-user-name            controllers.auth.RegisterController.checkUserNameUsage()
 GET     /check-email                controllers.auth.RegisterController.checkEmailUsage()
 
-GET     /individual-user-login      controllers.auth.LoginController.userLogin
+GET     /individual-user-login      controllers.auth.LoginController.userLogin()
 
+GET     /get-account                controllers.account.AccountDetailsController.getAccountData()
 POST    /update-profile             controllers.account.AccountDetailsController.updateProfileInformation()
 POST    /update-password            controllers.account.AccountDetailsController.updateUserPassword()
 POST    /update-settings            controllers.account.AccountDetailsController.updateUserSettings()
+
+POST    /create-feed-item           controllers.account.UserFeedController.createEvent()
+GET     /get-feed                   controllers.account.UserFeedController.retrieveFeed()

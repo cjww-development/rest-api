@@ -13,15 +13,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+package controllers.account
 
-package config
+import controllers.traits.account.UserFeedCtrl
+import services.UserFeedService
 
-trait MongoCollections {
-  //Collections
-  val USER_ACCOUNTS = "user-accounts"
-  val ORG_ACCOUNTS = "org-accounts"
-  val USER_FEED = "user-feed"
-
-  //Counts
-  val MAX_USER_FEED = 10
+class UserFeedController extends UserFeedCtrl {
+  val userFeedService = UserFeedService
 }
