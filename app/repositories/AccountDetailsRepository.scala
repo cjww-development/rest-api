@@ -81,7 +81,8 @@ trait AccountDetailsRepository extends MongoCollections {
         "$set" -> BSONDocument(
           "settings" -> BSONDocument(
             "displayName" -> accSettings.settings("displayName"),
-            "displayNameColour" -> accSettings.settings("displayNameColour")
+            "displayNameColour" -> accSettings.settings("displayNameColour"),
+            "displayImageURL" -> accSettings.settings("displayImageURL")
           )
         )
       )
