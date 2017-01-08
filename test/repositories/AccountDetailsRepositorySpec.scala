@@ -134,7 +134,15 @@ class AccountDetailsRepositorySpec extends PlaySpec with OneAppPerSuite with Moc
         when(mockMongoConnector.update(Matchers.any(), Matchers.any(), Matchers.any()))
           .thenReturn(Future.successful(successUWR))
 
-        val settings = AccountSettings("testUserId", Map("displayName" -> "testValue", "displayNameColour" -> "#FFFFFF"))
+        val settings =
+          AccountSettings(
+            "testUserId",
+            Map(
+              "displayName" -> "testValue",
+              "displayNameColour" -> "#FFFFFF",
+              "displayImageURL" -> "testUrl.com"
+            )
+          )
 
         val result = Await.result(TestRepository.updateSettings(settings), 5.seconds)
         result mustBe successUWR
