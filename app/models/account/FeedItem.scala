@@ -20,7 +20,13 @@ import java.util.UUID
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 
-case class FeedItem(_id : Option[String], userId : String, sourceDetail: SourceDetail, eventDetail: EventDetail, generated : DateTime) {
+case class FeedItem(_id : Option[String],
+                    userId : String,
+                    sourceDetail: SourceDetail,
+                    eventDetail: EventDetail,
+                    generated : DateTime) extends Ordering[FeedItem]{
+
+  override def compare(x: FeedItem, y: FeedItem) = x.generated compareTo y.generated
 
   def withId : FeedItem = {
     copy(_id = Some(s"feed-item-${UUID.randomUUID()}"))
