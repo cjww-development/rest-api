@@ -38,6 +38,6 @@ trait UserFeedRepository extends MongoCollections {
 
   def getFeedItems(userId : String) : Future[Option[List[FeedItem]]] = {
     val query = BSONDocument("userId" -> userId)
-    mongoConnector.readBulk[FeedItem](USER_FEED, query, MAX_USER_FEED)
+    mongoConnector.readBulk[FeedItem](USER_FEED, query)
   }
 }

@@ -39,12 +39,12 @@ class UserFeedServiceSpec extends PlaySpec with MockitoSugar with MongoMocks {
       val userFeedRepository = mockUserFeedRepo
     }
 
-    val expected = """{"feed-array":[{"_id" : "feedID1","userId" : "testUserId","sourceDetail" : {"service" : "aaa","location" : "bbb"},"eventDetail" : {"title" : "ccc","description":"ddd"},"generated":{"$date":1483272000000}},{"_id":"feedID2","userId":"testUserId","sourceDetail":{"service":"eee","location":"fff"},"eventDetail":{"title":"ggg","description":"hhh"},"generated":{"$date":1483272000000}}]}"""
+    val expected = """{"feed-array":[{"_id" : "feedID1","userId" : "testUserId","sourceDetail" : {"service" : "aaa","location" : "bbb"},"eventDetail" : {"title" : "ccc","description":"ddd"},"generated":{"$date":1483358400000}},{"_id":"feedID2","userId":"testUserId","sourceDetail":{"service":"eee","location":"fff"},"eventDetail":{"title":"ggg","description":"hhh"},"generated":{"$date":1483272000000}}]}"""
 
     val testList =
       Some(
         List(
-          FeedItem(Some("feedID1"), "testUserId", SourceDetail("aaa","bbb"), EventDetail("ccc","ddd"), DateTime.parse("2017-01-01T12:00:00Z")),
+          FeedItem(Some("feedID1"), "testUserId", SourceDetail("aaa","bbb"), EventDetail("ccc","ddd"), DateTime.parse("2017-01-02T12:00:00Z")),
           FeedItem(Some("feedID2"), "testUserId", SourceDetail("eee","fff"), EventDetail("ggg","hhh"), DateTime.parse("2017-01-01T12:00:00Z"))
         )
       )
@@ -69,7 +69,7 @@ class UserFeedServiceSpec extends PlaySpec with MockitoSugar with MongoMocks {
     "return an optional JsObject" when {
       "given a userID" in new Setup {
         when(mockUserFeedRepo.getFeedItems(Matchers.any()))
-          .thenReturn(Future.successful(testList))
+          .thenReturn(Future.successful(Some(testList.get.reverse)))
 
         val result = Await.result(TestService.getFeedList("testUserId"), 5.seconds)
         result mustBe Some(Json.parse(expected).as[JsObject])

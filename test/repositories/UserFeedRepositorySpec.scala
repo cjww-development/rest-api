@@ -72,7 +72,7 @@ class UserFeedRepositorySpec extends PlaySpec with MockitoSugar with OneAppPerSu
   "getFeedItems" should {
     "return an optional list of feed items" when {
       "given a userID" in new Setup {
-        when(mockMongoConnector.readBulk[FeedItem](Matchers.any(), Matchers.any(), Matchers.any())(Matchers.any()))
+        when(mockMongoConnector.readBulk[FeedItem](Matchers.any(), Matchers.any())(Matchers.any()))
           .thenReturn(Future.successful(feedList))
 
         val result = Await.result(TestRepository.getFeedItems("testUserID"), 5.seconds)

@@ -16,6 +16,8 @@
 package services
 
 import models.account.FeedItem
+import org.joda.time.DateTime
+import play.api.Logger
 import play.api.libs.json.{JsObject, Json}
 import repositories.UserFeedRepository
 
@@ -30,15 +32,26 @@ trait UserFeedService {
 
   val userFeedRepository : UserFeedRepository
 
+  private val MIN = 0
+  private val MAX = 10
+
   def createFeedItem(feedItem: FeedItem) : Future[Boolean] = {
     userFeedRepository.createFeedItem(feedItem) map {
       _.hasErrors
     }
   }
 
+  def flipList(list : Option[List[FeedItem]]) : Option[List[FeedItem]] = {
+    list.isDefined match {
+      case false => None
+      case true => Some(list.get.reverse.slice(MIN, MAX))
+    }
+  }
+
   def getFeedList(userId : String) : Future[Option[JsObject]] = {
     userFeedRepository.getFeedItems(userId) map {
-      list => convertToJsObject(list)
+      list =>
+        convertToJsObject(flipList(list))
     }
   }
 
@@ -46,7 +59,9 @@ trait UserFeedService {
     for {
       fi <- list
     } yield {
-      Json.obj("feed-array" -> fi)
+      val obj = Json.obj("feed-array" -> fi)
+      Logger.debug(s"[UserFeedService] - [convertToJsObject] : $obj")
+      obj
     }
   }
 }
